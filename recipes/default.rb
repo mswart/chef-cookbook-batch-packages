@@ -16,6 +16,7 @@ roles.insert(0, "base")
 
 # get the intersection of roles and available package collections
 needed = roles & bags
+Chef::Log.info "Installing packages: #{needed}"
 
 # install packages for each collection
 needed.each do |role|
