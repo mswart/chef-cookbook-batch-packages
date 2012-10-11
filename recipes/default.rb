@@ -21,6 +21,7 @@ Chef::Log.info "Installing packages: #{needed}"
 # install packages for each collection
 needed.each do |role|
   pkglist = search("batch-packages", "id:#{role}").first
+  packages = pkglist['packages'] || {}
   if pkglist then
     pkglist['packages'].each do |p, v|
       Chef::Log.info "Installing package #{p}..."
@@ -31,6 +32,20 @@ needed.each do |role|
         end
       else
         package p do
+          action :install
+        end
+      end
+    end
+    gem_packages = pkglist['gem_packages'] || {}
+    gem_packages.each do |p,v|
+      Chef::Log.info "Installing ruby package #{p}..."
+      if v then
+        gem_package p do
+          version v
+          action :install
+        end
+      else
+        gem_package p do
           action :install
         end
       end
