@@ -23,13 +23,14 @@ needed.each do |role|
   pkglist = search("batch-packages", "id:#{role}").first
   if pkglist then
     pkglist['packages'].each do |p, v|
-      Chef::Log.info "Installing package #{p}..."
       if v then
+        Chef::Log.info "Installing package #{p}=#{v}..."
         package p do
           version v
           action :install
         end
       else
+        Chef::Log.info "Installing package #{p}..."
         package p do
           action :install
         end
