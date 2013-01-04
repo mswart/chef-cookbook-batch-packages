@@ -22,7 +22,8 @@ Chef::Log.info "Installing packages: #{needed}"
 needed.each do |role|
   pkglist = search("batch-packages", "id:#{role}").first
   if pkglist then
-    pkglist['packages'].each do |p, v|
+    packages = pkglist['packages'] || {}
+    packages.each do |p, v|
       if v then
         Chef::Log.info "Installing package #{p}=#{v}..."
         package p do
