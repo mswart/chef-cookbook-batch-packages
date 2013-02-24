@@ -4,51 +4,63 @@
 #
 # Copyright 2012, AT&T Foundry
 #
-# All rights reserved 
+# All rights reserved
 
-# get list of available package collections
-bags = data_bag("batch-packages")
 
-# get list of roles applied to this node
-roles = node['roles'].dup
-# add the 'base' role that all nodes receive
-roles.insert(0, "base")
+if Chef::DataBag.list.include? node['batch-packages']['data_bag']
+  # get list of available package collections
+  bags = data_bag node['batch-packages']['data_bag']
 
-# get the intersection of roles and available package collections
-needed = roles & bags
-Chef::Log.info "Installing packages: #{needed}"
+  # get list of roles applied to this node
+  roles = node['roles'].dup
+  # add the 'base' role that all nodes receive
+  roles.insert(0, "base")
 
-# install packages for each collection
+  # get the intersection of roles and available package collections
+  needed = roles & bags
+  Chef::Log.info "Receive packages for roles: #{needed} + attributes"
+else
+  Chef::Log.info "Receive packages for attributes (not #{node['batch-packages']['data_bag']} data bag)"
+end
+
+# fetch + merge package lists
+packages = {}
+gem_packages = {}
 needed.each do |role|
-  pkglist = search("batch-packages", "id:#{role}").first
-  if pkglist then
-    packages = pkglist['packages'] || {}
-    packages.each do |p, v|
-      if v then
-        Chef::Log.info "Installing package #{p}=#{v}..."
-        package p do
-          version v
+  item = data_bag_item(node['batch-packages']['data_bag'], role)
+  packages.merge!(item['packages'] || {})
+  gem_packages.merge!(item['gem_packages'] || {})
+end
+packages.merge! node['batch-packages']['packages']
+gem_packages.merge! node['batch-packages']['gem_packages']
+
+# create resource definitions (for packages and for gem_packages)
+# this is a little bit ruby magic to avoid code dublication
+{
+  lambda { |n, &block| package n, &block } => ['system', packages],
+  lambda { |n, &block| gem_package n, &block } => ['ruby', gem_packages]
+}.each do |define_resource, (pkg_type, pkgs)|
+  # install packages
+  pkgs.each do |pkg, ver|
+    next if ver.nil? # skip
+    define_resource.call pkg do
+      case ver
+        when false then
+          Chef::Log.info "Removing #{pkg_type} package #{pkg}..."
+          action :remove
+        when true then
+          Chef::Log.info "Upgrading #{pkg_type} package #{pkg}..."
+          action :upgrade
+        when -1 then
+          Chef::Log.info "Purging #{pkg_type} package #{pkg}..."
+          action :purge
+        when '' then
+          Chef::Log.info "Installing #{pkg_type} package #{pkg}..."
           action :install
-        end
-      else
-        Chef::Log.info "Installing package #{p}..."
-        package p do
+        else
+          Chef::Log.info "Installing #{pkg_type} package #{pkg}=#{ver}..."
           action :install
-        end
-      end
-    end
-    gem_packages = pkglist['gem_packages'] || {}
-    gem_packages.each do |p,v|
-      Chef::Log.info "Installing ruby package #{p}..."
-      if v then
-        gem_package p do
-          version v
-          action :install
-        end
-      else
-        gem_package p do
-          action :install
-        end
+          version ver
       end
     end
   end
