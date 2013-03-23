@@ -1,3 +1,4 @@
+name             "batch-packages"
 maintainer       "AT&T Foundry"
 maintainer_email "james.kyle@att.com"
 license          "All rights reserved"
