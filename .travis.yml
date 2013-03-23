@@ -7,4 +7,4 @@ gemfile:
   - spec/support/gemfiles/Gemfile.chef10
   - spec/support/gemfiles/Gemfile.chef11
 
-before_install: ln -s chef-cookbook-batch-packages mswart/batch-packages
+before_script: ln -s chef-cookbook-batch-packages ../batch-packages
