@@ -20,7 +20,8 @@ if Chef::DataBag.list.include? node['batch-packages']['data_bag']
   needed = roles & bags
   Chef::Log.info "Receive packages for roles: #{needed} + attributes"
 else
-  Chef::Log.info "Receive packages for attributes (not #{node['batch-packages']['data_bag']} data bag)"
+  needed = []
+  Chef::Log.info "Receive packages for attributes (no #{node['batch-packages']['data_bag']} data bag)"
 end
 
 # fetch + merge package lists
