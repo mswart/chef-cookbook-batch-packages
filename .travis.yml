@@ -7,4 +7,6 @@ gemfile:
   - spec/support/gemfiles/Gemfile.chef10
   - spec/support/gemfiles/Gemfile.chef11
 
-before_script: ln -s chef-cookbook-batch-packages ../batch-packages
+before_script:
+  - ln -s chef-cookbook-batch-packages ../batch-packages
+  - if echo $RUBY_VERSION | grep 1.8.7 >/dev/null; then rvm rubygems 1.8.25; gem --version; fi
