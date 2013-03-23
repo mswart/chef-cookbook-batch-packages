@@ -4,4 +4,4 @@ gem 'chef', '~> 11.0'
 
 gem 'rake'
 gem 'foodcritic'
-gem 'chefspec'
+gem 'chefspec', '>= 1.0.0.rc1'
