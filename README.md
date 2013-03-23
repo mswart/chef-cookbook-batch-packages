@@ -1,5 +1,6 @@
 Description
 ===========
+[![Build Status](https://travis-ci.org/mswart/chef-cookbook-batch-packages.png)](https://travis-ci.org/mswart/chef-cookbook-batch-packages)
 
 The batch-packages cookbook facilitates the bulk installation of both gem and
 system packages. It should only be used for installation of dependencies that
