@@ -7,22 +7,17 @@
 # All rights reserved
 
 
-if Chef::DataBag.list.include? node['batch-packages']['data_bag']
-  # get list of available package collections
-  bags = data_bag node['batch-packages']['data_bag']
+# get list of available package collections - silently returns empty list if data_bag not found
+bags = data_bag node['batch-packages']['data_bag']
 
-  # get list of roles applied to this node
-  roles = node['roles'].dup
-  # add the 'base' role that all nodes receive
-  roles.insert(0, "base")
+# get list of roles applied to this node
+roles = node['roles'].dup
+# add the 'base' role that all nodes receive
+roles.insert(0, "base")
 
-  # get the intersection of roles and available package collections
-  needed = roles & bags
-  Chef::Log.info "Receive packages for roles: #{needed} + attributes"
-else
-  needed = []
-  Chef::Log.info "Receive packages for attributes (no #{node['batch-packages']['data_bag']} data bag)"
-end
+# get the intersection of roles and available package collections
+needed = roles & bags
+Chef::Log.info "Receive packages for roles: #{needed.inspect} + attributes"
 
 # fetch + merge package lists
 packages = {}

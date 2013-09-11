@@ -23,11 +23,11 @@ describe 'batch-packages::default' do
 
   before do
     Chef::Config[:role_path] = 'spec/support/roles'
+    Chef::Config[:data_bag_path] = 'spec/support/data_bags'
   end
 
   context 'with batch-package data bag' do
     before do
-      Chef::DataBag.stub(:list).and_return %w(batch-packages)
       Chef::Recipe.any_instance.stub(:data_bag).with('batch-packages').and_return %w(base)
     end
     it 'should always use base role' do
@@ -64,11 +64,8 @@ describe 'batch-packages::default' do
   end
 
   context 'without batch-package data bag' do
-    before do
-      Chef::DataBag.stub(:list).and_return []
-    end
     it 'should log warning about missing data bag' do
-      Chef::Log.should_receive(:info).with('Receive packages for attributes (no batch-packages data bag)').once
+      Chef::Log.should_receive(:info).with('Receive packages for roles: [] + attributes').once
       Chef::Log.should_receive(:info).with(any_args()).any_number_of_times
       chef_run
     end
