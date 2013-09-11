@@ -17,7 +17,7 @@ roles.insert(0, "base")
 
 # get the intersection of roles and available package collections
 needed = roles & bags
-Chef::Log.info "Receive packages for roles: #{needed} + attributes"
+Chef::Log.info "Receive packages for roles: #{needed.inspect} + attributes"
 
 # fetch + merge package lists
 packages = {}
