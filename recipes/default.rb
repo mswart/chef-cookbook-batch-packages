@@ -7,7 +7,7 @@
 # All rights reserved
 
 
-if Chef::DataBag.list.include? node['batch-packages']['data_bag']
+if (not Chef::Config[:solo]) and Chef::DataBag.list.include? node['batch-packages']['data_bag']
   # get list of available package collections
   bags = data_bag node['batch-packages']['data_bag']
 
